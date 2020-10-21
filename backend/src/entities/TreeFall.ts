@@ -2,15 +2,15 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import Image from './Image';
 
-@Entity('TreeFalls')
+@Entity('treefalls')
 export default class TreeFall {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   street: string;
@@ -36,7 +36,7 @@ export default class TreeFall {
   @Column()
   longitude: number;
 
-  @ManyToOne(() => Image, image => image.treeFall, {
+  @OneToMany(() => Image, image => image.treeFall, {
     cascade: ['insert', 'update'],
   })
   @JoinColumn({ name: 'treefall_id' })
