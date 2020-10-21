@@ -1,10 +1,10 @@
-import Image from '../entities/Images';
+import Image from '../entities/Image';
 
 export default {
   render(image: Image) {
     return {
       id: image.id,
-      url: `http://localhost:3333/uploads/${image.path}`,
+      url: `${process.env.URL_IMAGE}/uploads/${image.path}`,
     };
   },
 
