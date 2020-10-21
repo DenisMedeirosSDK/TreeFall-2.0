@@ -8,19 +8,47 @@ export class createTreeFall1603144428931 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'integer',
+            type: 'uuid',
             isPrimary: true,
-            isGenerated: true,
-            generationStrategy: 'increment',
+            isUnique: true,
+            generationStrategy: 'uuid',
           },
-          { name: 'street', type: 'varchar' },
-          { name: 'neighborhood', type: 'varchar' },
-          { name: 'city', type: 'varchar' },
-          { name: 'state', type: 'varchar' },
-          { name: 'country', type: 'varchar' },
-          { name: 'zipcode', type: 'varchar' },
-          { name: 'latitude', type: 'decimal', precision: 2, scale: 10 },
-          { name: 'longitude', type: 'decimal', precision: 2, scale: 10 },
+          {
+            name: 'street',
+            type: 'varchar',
+          },
+          {
+            name: 'neighborhood',
+            type: 'varchar',
+          },
+          {
+            name: 'city',
+            type: 'varchar',
+          },
+          {
+            name: 'state',
+            type: 'varchar',
+          },
+          {
+            name: 'country',
+            type: 'varchar',
+          },
+          {
+            name: 'zipcode',
+            type: 'varchar',
+          },
+          {
+            name: 'latitude',
+            type: 'decimal',
+            scale: 10,
+            precision: 2,
+          },
+          {
+            name: 'longitude',
+            type: 'decimal',
+            scale: 10,
+            precision: 2,
+          },
         ],
       })
     );
