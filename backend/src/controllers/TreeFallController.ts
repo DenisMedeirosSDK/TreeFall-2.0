@@ -1,17 +1,19 @@
 import { Request, Response } from 'express';
 import { getRepository } from 'typeorm';
-import TreeFall from '../entities/TreeFall';
+import { v4 } from 'uuid';
+import * as Yup from 'yup';
 
+import TreeFall from '../entities/TreeFall';
 import treeFallView from '../views/treeFalls_view';
 
 export default {
   async show(request: Request, response: Response) {
-    const { id } = request.params;
-
     const treeFallRepository = getRepository(TreeFall);
 
+    const { id } = request.params;
+
     const treeFall = await treeFallRepository.findOneOrFail(id, {
-      where: { id },
+      relations: ['images'],
     });
 
     return response.json(treeFallView.render(treeFall));
@@ -48,6 +50,7 @@ export default {
     });
 
     const data = {
+      id: v4(),
       street,
       neighborhood,
       city,
@@ -58,6 +61,26 @@ export default {
       longitude,
       images,
     };
+
+    const schema = Yup.object().shape({
+      street: Yup.string().required(),
+      neighborhood: Yup.string().required(),
+      city: Yup.string().required(),
+      state: Yup.string().required(),
+      country: Yup.string().required(),
+      zipcode: Yup.string().required(),
+      latitude: Yup.number().required(),
+      longitude: Yup.number().required(),
+      images: Yup.array(
+        Yup.object().shape({
+          path: Yup.string().required(),
+        })
+      ),
+    });
+
+    await schema.validate(data, {
+      abortEarly: false,
+    });
 
     const treeFall = treeFallRepository.create(data);
 
