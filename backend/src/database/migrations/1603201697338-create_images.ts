@@ -20,15 +20,15 @@ export class createImages1603201697338 implements MigrationInterface {
           },
           {
             name: 'treefall_id',
-            type: 'integer',
+            type: 'interger',
           },
         ],
         foreignKeys: [
           {
             name: 'ImageTreeFall',
             columnNames: ['treefall_id'],
-            referencedColumnNames: ['id'],
             referencedTableName: 'treefalls',
+            referencedColumnNames: ['id'],
             onUpdate: 'CASCADE',
             onDelete: 'CASCADE',
           },
