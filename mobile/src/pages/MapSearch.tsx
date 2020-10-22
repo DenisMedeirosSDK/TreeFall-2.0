@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Alert } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Callout, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 import { Feather } from '@expo/vector-icons';
@@ -8,11 +8,26 @@ import { Feather } from '@expo/vector-icons';
 import styles from '../styles/pages/mapSearch';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
+import api from '../services/api';
+
+interface ITreeFall {
+  id: string;
+  street: string;
+  latitude: number;
+  longitude: number;
+}
 
 export default function MapSearch() {
   const navigation = useNavigation();
 
   const [initialRegion, setInitialRegion] = useState([0, 0]);
+  const [treeFalls, setTreeFalls] = useState<ITreeFall[]>([]);
+
+  useEffect(() => {
+    api.get('treefall/index').then(response => {
+      setTreeFalls(response.data);
+    });
+  }, []);
 
   useEffect(() => {
     async function loadPosition() {
@@ -38,7 +53,7 @@ export default function MapSearch() {
       }
     }
     loadPosition();
-  }, [initialRegion]);
+  }, []);
 
   function handleCreateTreeFall() {
     navigation.navigate('SelectMapPosition');
@@ -57,16 +72,29 @@ export default function MapSearch() {
             longitudeDelta: 0.014,
           }}
         >
-          <Marker
-            coordinate={{
-              latitude: initialRegion[0],
-              longitude: initialRegion[1],
-            }}
-          />
+          {treeFalls.map(treeFall => {
+            return (
+              <Marker
+                key={treeFall.id}
+                coordinate={{
+                  latitude: treeFall.latitude,
+                  longitude: treeFall.longitude,
+                }}
+              >
+                <Callout>
+                  <View>
+                    <Text>{treeFall.street}</Text>
+                  </View>
+                </Callout>
+              </Marker>
+            );
+          })}
         </MapView>
       )}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>2 árvores caídas encontradas</Text>
+        <Text style={styles.footerText}>
+          {treeFalls.length} árvores caídas encontradas
+        </Text>
         <TouchableOpacity
           style={styles.createTreeFallButton}
           onPress={handleCreateTreeFall}
