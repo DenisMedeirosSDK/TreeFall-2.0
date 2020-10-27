@@ -23,11 +23,15 @@ export default function MapSearch() {
   const [initialRegion, setInitialRegion] = useState([0, 0]);
   const [treeFalls, setTreeFalls] = useState<ITreeFall[]>([]);
 
+  function handleNavigateToTreeFallDetail(id: string) {
+    navigation.navigate('TreeFallDetails', { id });
+  }
+
   useEffect(() => {
     api.get('treefall/index').then(response => {
       setTreeFalls(response.data);
     });
-  }, []);
+  }, [treeFalls]);
 
   useEffect(() => {
     async function loadPosition() {
@@ -81,7 +85,9 @@ export default function MapSearch() {
                   longitude: treeFall.longitude,
                 }}
               >
-                <Callout>
+                <Callout
+                  onPress={() => handleNavigateToTreeFallDetail(treeFall.id)}
+                >
                   <View>
                     <Text>{treeFall.street}</Text>
                   </View>
