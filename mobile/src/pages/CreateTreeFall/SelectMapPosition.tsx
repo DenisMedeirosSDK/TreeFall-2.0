@@ -11,10 +11,11 @@ import mapMarkerImg from '../../images/arvore.png';
 export default function SelectMapPosition() {
   const navigation = useNavigation();
   const [position, setPosition] = useState({ latitude: 0, longitude: 0 });
-  const [initialPosition, setInitialPosition] = useState<[number, number]>([
-    0,
-    0,
-  ]);
+  const [initialRegion, setInitialRegion] = useState([0, 0]);
+
+  if (!initialRegion) {
+    return <p style={styles.loadMap}>Carregando...</p>;
+  }
 
   function handleNextStep() {
     navigation.navigate('treeFallData', { position });
@@ -25,48 +26,46 @@ export default function SelectMapPosition() {
 
   useEffect(() => {
     async function loadPosition() {
-      try {
-        const { status } = await Location.requestPermissionsAsync();
+      const { status } = await Location.requestPermissionsAsync();
 
-        if (status !== 'granted') {
-          Alert.alert('Precisamos de sua permissão para obter a localização');
-          return;
-        }
-        const location = await Location.getCurrentPositionAsync({
-          accuracy: 4,
-        });
-
-        const { latitude, longitude } = location.coords;
-
-        setInitialPosition([latitude, longitude]);
-      } catch (error) {
+      if (status !== 'granted') {
+        Alert.alert('Precisamos de sua permissão para obter a localização');
         return;
       }
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: 4,
+      });
+
+      const { latitude, longitude } = location.coords;
+
+      setInitialRegion([latitude, longitude]);
     }
     loadPosition();
-  });
+  }, [initialRegion]);
 
   return (
     <View style={styles.container}>
-      <MapView
-        initialRegion={{
-          latitude: initialPosition[0],
-          longitude: initialPosition[1],
-          latitudeDelta: 0.008,
-          longitudeDelta: 0.008,
-        }}
-        style={styles.mapStyle}
-        onPress={handleSelectMapPosition}
-      >
-        {position.latitude !== 0 && (
-          <Marker
-            coordinate={{
-              latitude: position.latitude,
-              longitude: position.longitude,
-            }}
-          />
-        )}
-      </MapView>
+      {initialRegion[0] !== 0 && (
+        <MapView
+          initialRegion={{
+            latitude: initialRegion[0],
+            longitude: initialRegion[1],
+            latitudeDelta: 0.008,
+            longitudeDelta: 0.008,
+          }}
+          style={styles.mapStyle}
+          onPress={handleSelectMapPosition}
+        >
+          {position.latitude !== 0 && (
+            <Marker
+              coordinate={{
+                latitude: position.latitude,
+                longitude: position.longitude,
+              }}
+            />
+          )}
+        </MapView>
+      )}
       {position.latitude !== 0 && (
         <RectButton style={styles.nextButton} onPress={handleNextStep}>
           <Text style={styles.nextButtonText}>Próximo</Text>
@@ -103,5 +102,9 @@ const styles = StyleSheet.create({
   nextButtonText: {
     fontSize: 16,
     color: '#FFF',
+  },
+  loadMap: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
