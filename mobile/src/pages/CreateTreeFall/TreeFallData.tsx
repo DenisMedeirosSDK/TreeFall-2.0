@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import {
   ScrollView,
   View,
@@ -14,6 +14,7 @@ import { RectButton } from 'react-native-gesture-handler';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../services/api';
+import cep from 'cep-promise';
 
 interface IOrphanageDataRouteParams {
   position: {
@@ -35,6 +36,15 @@ export default function OrphanageData() {
   const [zipcode, setZipcode] = useState('');
   const [images, setImages] = useState<string[]>([]);
 
+  cep(`${zipcode}`)
+    .then(response => {
+      setCity(response.city),
+        setNeighborhood(response.neighborhood),
+        setState(response.state),
+        setStreet(response.street);
+    })
+    .then(console.log);
+
   async function handleCreateTreeFall() {
     const { latitude, longitude } = params.position;
 
@@ -44,8 +54,10 @@ export default function OrphanageData() {
     data.append('neighborhood', neighborhood);
     data.append('city', city);
     data.append('state', state);
-    data.append('country', country);
+    data.append('country', 'brasil');
     data.append('zipcode', zipcode);
+    data.append('latitude', String(latitude));
+    data.append('longitude', String(longitude));
 
     images.forEach((image, index) => {
       data.append('images', {
@@ -59,6 +71,7 @@ export default function OrphanageData() {
 
     navigation.navigate('mapSearch');
   }
+
   async function handleSelectImage() {
     const { status } = await ImagePicker.requestCameraRollPermissionsAsync();
 
@@ -129,12 +142,12 @@ export default function OrphanageData() {
       <Text style={styles.label}>Estado</Text>
       <TextInput style={styles.input} value={state} onChangeText={setState} />
 
-      <Text style={styles.label}>País</Text>
+      {/* <Text style={styles.label}>País</Text>
       <TextInput
         style={styles.input}
         value={country}
         onChangeText={setCountry}
-      />
+      /> */}
 
       {/* <Text style={styles.title}>Suas informações</Text>
 
